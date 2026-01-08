@@ -30,14 +30,17 @@ public class EmployeeEntity {
 	private String designation;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "department_id")
-	private DepartmentEntity dept_id;
+	private DepartmentEntity deptId;
 	@Column(name="date_of_joining")
-	private LocalDate joining_date;
+	private LocalDate joiningDate;
 	@Column(name="status")
 	@Enumerated(EnumType.STRING)
 	private EmployeeStatus status;
 	@Column(name="phone")
 	private String number;
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="organization_id")
+	private OrganizationEntity organizationId;
 	public Long getId() {
 		return id;
 	}
@@ -68,17 +71,17 @@ public class EmployeeEntity {
 	public void setDesignation(String designation) {
 		this.designation = designation;
 	}
-	public DepartmentEntity getDept_id() {
-		return dept_id;
+	public DepartmentEntity getDeptId() {
+		return deptId;
 	}
-	public void setDept_id(DepartmentEntity dept_id) {
-		this.dept_id = dept_id;
+	public void setDeptId(DepartmentEntity deptId) {
+		this.deptId = deptId;
 	}
-	public LocalDate getJoining_date() {
-		return joining_date;
+	public LocalDate getJoiningDate() {
+		return joiningDate;
 	}
-	public void setJoining_date(LocalDate joining_date) {
-		this.joining_date = joining_date;
+	public void setJoiningDate(LocalDate joiningDate) {
+		this.joiningDate = joiningDate;
 	}
 	public EmployeeStatus getStatus() {
 		return status;
@@ -92,5 +95,12 @@ public class EmployeeEntity {
 	public void setNumber(String number) {
 		this.number = number;
 	}
+	public OrganizationEntity getOrganizationId() {
+		return organizationId;
+	}
+	public void setOrganizationId(OrganizationEntity organizationId) {
+		this.organizationId = organizationId;
+	}
+	
 
 }

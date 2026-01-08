@@ -40,7 +40,7 @@ public class EmployeeDto {
     @Size(min = 2, max = 100, message = "Designation must be between 2 and 100 characters")
     private String designation;
 
-    @NotNull(message = "Department is required")
+   
     private Long departmentId;
 
     @NotNull(message = "Date of joining is required")
@@ -48,7 +48,7 @@ public class EmployeeDto {
     private LocalDate joiningDate;
 
     @NotNull(message = "Employee status is required")
-    private EmployeeStatus status;
+    private EmployeeStatus status=EmployeeStatus.ACTIVE;
 
     @NotBlank(message = "Phone number is required")
     @Pattern(
@@ -56,6 +56,16 @@ public class EmployeeDto {
         message = "Phone number must be a valid 10-digit Indian number"
     )
     private String number;
+    @NotNull(message = "Organization Id is required")
+    private Long organizationId;
+
+	public Long getOrganizationId() {
+		return organizationId;
+	}
+
+	public void setOrganizationId(Long organizationId) {
+		this.organizationId = organizationId;
+	}
 
 	public Long getId() {
 		return id;
