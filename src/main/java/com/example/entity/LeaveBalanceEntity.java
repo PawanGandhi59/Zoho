@@ -1,45 +1,62 @@
 package com.example.entity;
 
+import java.math.BigDecimal;
+import java.time.Year;
+
+import com.example.dto.LeaveBalanceDto;
+
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "leave_balance")
 public class LeaveBalanceEntity {
-
-    @EmbeddedId
-    private LeaveBalanceId id;
-
-    public void setId(LeaveBalanceId id) {
-		this.id = id;
-	}
-
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
 	@ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("employeeId")
     @JoinColumn(name = "employee_id")
     private EmployeeEntity employee;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("leaveTypeId")
     @JoinColumn(name = "leave_type_id")
     private LeaveTypeEntity leaveType;
 
     @Column(name = "available_days")
-    private Double availableDays;
+    private BigDecimal availableDays;
+    @Column(name="year")
+    private Year year;
 
-    public LeaveBalanceEntity() {}
+    public Year getYear() {
+		return year;
+	}
 
-    public LeaveBalanceEntity(EmployeeEntity employee, LeaveTypeEntity leaveType, Double availableDays) {
-        this.employee = employee;
-        this.leaveType = leaveType;
-        this.availableDays = availableDays;
-        this.id = new LeaveBalanceId(employee.getId(), leaveType.getId());
-    }
+	public void setYear(Year year) {
+		this.year = year;
+	}
 
-    public LeaveBalanceId getId() {
-        return id;
-    }
+	public void setEmployee(EmployeeEntity employee) {
+		this.employee = employee;
+	}
 
-    public EmployeeEntity getEmployee() {
+	public void setLeaveType(LeaveTypeEntity leaveType) {
+		this.leaveType = leaveType;
+	}
+
+	public LeaveBalanceEntity() {}
+
+
+
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public EmployeeEntity getEmployee() {
         return employee;
     }
 
@@ -47,11 +64,21 @@ public class LeaveBalanceEntity {
         return leaveType;
     }
 
-    public Double getAvailableDays() {
+    public BigDecimal getAvailableDays() {
         return availableDays;
     }
 
-    public void setAvailableDays(Double availableDays) {
+    public void setAvailableDays(BigDecimal availableDays) {
         this.availableDays = availableDays;
+    }
+    
+    public LeaveBalanceDto toDto() {
+    	LeaveBalanceDto dto=new LeaveBalanceDto();
+    	dto.setAvailableDays(this.availableDays);
+    	dto.setEmployeeId(this.employee.getId());
+    	dto.setLeaveTypeId(this.leaveType.getId());
+    	dto.setYear(this.year);
+    	dto.setId(this.id);
+    	return dto;
     }
 }

@@ -15,12 +15,6 @@ public class TimeSheetDto {
     @NotNull
     @Positive
     private Long employeeId;
-    @NotNull
-    @PastOrPresent
-    private LocalDate monthStart;
-    private LocalDate monthEnd;
-    @NotNull
-    @Positive
     private BigDecimal totalHours;
     @NotNull
     private TimeSheetStatus status;
@@ -35,18 +29,6 @@ public class TimeSheetDto {
 	}
 	public void setEmployeeId(Long employeeId) {
 		this.employeeId = employeeId;
-	}
-	public LocalDate getMonthStart() {
-		return monthStart;
-	}
-	public void setMonthStart(LocalDate monthStart) {
-		this.monthStart = monthStart;
-	}
-	public LocalDate getMonthEnd() {
-		return monthEnd;
-	}
-	public void setMonthEnd(LocalDate monthEnd) {
-		this.monthEnd = monthEnd;
 	}
 	public BigDecimal getTotalHours() {
 		return totalHours;

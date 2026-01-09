@@ -2,6 +2,8 @@ package com.example.entity;
 
 import java.time.LocalDate;
 
+import com.example.dto.LeaveRequestDto;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -18,9 +20,8 @@ public class LeaveRequestEntity {
     private EmployeeEntity employee;
 
 
-	@Enumerated(EnumType.STRING)
     @Column(name = "leave_type")
-    private LeaveTypeStatus leaveType;
+    private Long leaveType;
 
     @Column(name = "start_date")
     private LocalDate startDate;
@@ -56,12 +57,12 @@ public class LeaveRequestEntity {
 	}
 
 
-	public LeaveTypeStatus getLeaveType() {
+	public Long getLeaveType() {
 		return leaveType;
 	}
 
 
-	public void setLeaveType(LeaveTypeStatus leaveType) {
+	public void setLeaveType(Long leaveType) {
 		this.leaveType = leaveType;
 	}
 
@@ -105,7 +106,18 @@ public class LeaveRequestEntity {
 		this.status = status;
 	}
 
-
+	public LeaveRequestDto toDto() {
+		LeaveRequestDto dto=new LeaveRequestDto();
+		dto.setEmployeeId(this.employee.getId());
+		dto.setEndDate(this.endDate);
+		dto.setId(this.id);
+		dto.setLeaveStatus(this.status);
+		dto.setLeaveType(this.leaveType);
+		dto.setReason(this.reason);
+		dto.setStartDate(this.startDate);
+		dto.setEndDate(this.endDate);
+		return dto;
+	}
 
  
     }

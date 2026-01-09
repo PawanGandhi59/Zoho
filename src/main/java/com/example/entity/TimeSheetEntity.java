@@ -3,6 +3,8 @@ package com.example.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.example.dto.TimeSheetDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +18,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "monthly_timesheet")
+@Table(name = "timesheet")
 public class TimeSheetEntity {
 
     @Id
@@ -26,12 +28,6 @@ public class TimeSheetEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private EmployeeEntity employee;
-
-    @Column(name = "month_start")
-    private LocalDate monthStart;
-
-    @Column(name = "month_end")
-    private LocalDate monthEnd;
 
     @Column(name = "total_hours")
     private BigDecimal totalHours;
@@ -56,21 +52,6 @@ public class TimeSheetEntity {
 		this.employee = employee;
 	}
 
-	public LocalDate getMonthStart() {
-		return monthStart;
-	}
-
-	public void setMonthStart(LocalDate monthStart) {
-		this.monthStart = monthStart;
-	}
-
-	public LocalDate getMonthEnd() {
-		return monthEnd;
-	}
-
-	public void setMonthEnd(LocalDate monthEnd) {
-		this.monthEnd = monthEnd;
-	}
 
 	public BigDecimal getTotalHours() {
 		return totalHours;
@@ -86,6 +67,15 @@ public class TimeSheetEntity {
 
 	public void setStatus(TimeSheetStatus status) {
 		this.status = status;
+	}
+	
+	public TimeSheetDto toDto() {
+		TimeSheetDto dto=new TimeSheetDto();
+		dto.setEmployeeId(this.employee.getId());
+		dto.setId(this.id);
+		dto.setStatus(this.status);
+		dto.setTotalHours(this.totalHours);
+		return dto;
 	}
 }
 

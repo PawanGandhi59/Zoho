@@ -1,12 +1,19 @@
 package com.example.entity;
 
+import java.math.BigDecimal;
+
+import com.example.dto.LeaveTypeDto;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,7 +26,16 @@ public class LeaveTypeEntity {
 	@Enumerated(EnumType.STRING)
 	private LeaveTypeStatus name;
 	@Column(name="max_days_per_year")
-	private Integer max_days_per_year;
+	private BigDecimal maxDaysPerYear;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="organization_id")
+	private OrganizationEntity organizationId;
+	public OrganizationEntity getOrganizationId() {
+		return organizationId;
+	}
+	public void setOrganizationId(OrganizationEntity organizationId) {
+		this.organizationId = organizationId;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -32,10 +48,20 @@ public class LeaveTypeEntity {
 	public void setName(LeaveTypeStatus name) {
 		this.name = name;
 	}
-	public Integer getMax_days_per_year() {
-		return max_days_per_year;
+
+	
+	public BigDecimal getMaxDaysPerYear() {
+		return maxDaysPerYear;
 	}
-	public void setMax_days_per_year(Integer max_days_per_year) {
-		this.max_days_per_year = max_days_per_year;
+	public void setMaxDaysPerYear(BigDecimal maxDaysPerYear) {
+		this.maxDaysPerYear = maxDaysPerYear;
+	}
+	public LeaveTypeDto toDto() {
+		LeaveTypeDto dto=new LeaveTypeDto();
+		dto.setId(this.id);
+		dto.setMaxDaysPerYear(this.maxDaysPerYear);
+		dto.setName(this.name);
+		dto.setOrganizationId(this.organizationId.getId());
+		return dto;
 	}
 }
