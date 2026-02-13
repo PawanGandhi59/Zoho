@@ -111,6 +111,7 @@ public class TeamService {
 		if(teamStatus.isEmpty()) {return new ApiResponse(false,"Team not found or inactive",null);}
 		Optional<EmployeeEntity> creatorStatus = employeeRepository.findByIdAndStatus(creatorId,EmployeeStatus.ACTIVE);
 		if(creatorStatus.isEmpty()) {return new ApiResponse(false,"deactivator not found or inactive",null);}
+		if(!teamStatus.get().getOrganizationId().getId().equals(creatorStatus.get().getOrganizationId().getId())) {return new ApiResponse(false,"Team and team deleter not from same organization",null);}
 		if(creatorStatus.get().getDesignation().equalsIgnoreCase("hr") || creatorStatus.get().getDesignation().equalsIgnoreCase("ceo")) 
 	    {
 			TeamEntity teamEntity = teamStatus.get();

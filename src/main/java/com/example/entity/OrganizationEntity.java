@@ -24,6 +24,7 @@ public class OrganizationEntity {
 	private String timezone;
 	@Column(name="created_at")
 	private LocalDateTime created_at;
+	@Column(name="status")
 	private String status;
 	public String getStatus() {
 		return status;

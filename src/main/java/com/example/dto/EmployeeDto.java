@@ -2,6 +2,8 @@ package com.example.dto;
 
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 import com.example.entity.EmployeeStatus;
 
@@ -58,6 +60,25 @@ public class EmployeeDto {
     private String number;
     @NotNull(message = "Organization Id is required")
     private Long organizationId;
+    @NotBlank
+    private String password;
+    @NotNull
+    private List<Long> roleId;
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public List<Long> getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(List<Long> roleId) {
+		this.roleId = roleId;
+	}
 
 	public Long getOrganizationId() {
 		return organizationId;

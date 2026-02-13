@@ -22,6 +22,8 @@ import com.example.repository.DepartmentRepository;
 import com.example.repository.EmployeeRepository;
 import com.example.repository.OrganizationRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class DepartmentService {
 	private DepartmentRepository departmentRepository;
@@ -53,7 +55,7 @@ public class DepartmentService {
 	    if(employee.getOrganizationId().getId()!=dptDto.getOrganization()) 
 	    	{return new ApiResponse(false,"Employee does not belong to organization",null);}
 	    
-	    if(employee.getDesignation().equalsIgnoreCase("hr") || employee.getDesignation().equalsIgnoreCase("ceo")) 
+	    if(employee.getDesignation().equalsIgnoreCase("hr") || employee.getDesignation().equalsIgnoreCase("ceo") ||employee.getDesignation().equalsIgnoreCase("owner")) 
 	    {
 		    Optional<OrganizationEntity> byIdAndStatus = organizationRepository.findByIdAndStatus(dptDto.getOrganization(),"ACTIVE");
 			if(byIdAndStatus.isEmpty()) {return new ApiResponse<DepartmentDto>(false,"Organization not found",null);}
@@ -127,7 +129,7 @@ public class DepartmentService {
 		    }
 		    else {return new ApiResponse(false,"Unauthorized user",null);}
 	}
-	
+
 	public ApiResponse<DepartmentDto> deactivate(Long deptId,Long employeeId){
 		Optional<DepartmentEntity> byId = departmentRepository.findByIdAndStatus(deptId,"ACTIVE");
 		if(byId.isEmpty()) {return new ApiResponse<DepartmentDto>(false,"Department not found",null);}

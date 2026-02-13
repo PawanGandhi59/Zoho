@@ -2,6 +2,7 @@ package com.example.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,7 @@ public class JobController {
 	public JobController(JobService jobService) {
 		this.jobService=jobService;
 	}
+	@PreAuthorize("#creatorId==principal.userId")
 	@PostMapping("/create/{creatorId}")
 	public ResponseEntity<ApiResponse<JobDto>> create(@PathVariable("creatorId") Long  creatorId,@Valid @RequestBody JobDto jobDto){
 		ApiResponse<JobDto> apiResponse = jobService.create(jobDto, creatorId);

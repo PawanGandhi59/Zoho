@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,26 +30,27 @@ public class TimeLogController {
 	public TimeLogController(TimeLogService timeLogService) {
 		this.timeLogService=timeLogService;
 	}
+	@PreAuthorize("#timeLogDto.employeeId==principal.userID")
 	@PostMapping("/create")
 	public ResponseEntity<ApiResponse<TimeLogDto>> create(@Valid @RequestBody TimeLogDto timeLogDto){
 		ApiResponse<TimeLogDto> apiResponse = timeLogService.create(timeLogDto);
 		if(!apiResponse.isSuccess()) {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);}
 		return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
 	}
-	
+	@PreAuthorize("#empId==principal.userID")
 	@GetMapping("/getmonthly/{empId}")
 	public ResponseEntity<List<TimeLogDto>> getMonthlyLogs(@PathVariable("empId") Long empId){
 		List<TimeLogDto> monthlyLogs = timeLogService.getMonthlyLogs(empId,LocalDate.now());
 		return ResponseEntity.ok(monthlyLogs);
 	}
-	
+	@PreAuthorize("#timeLogDto.employeeId==principal.userID")
 	@PutMapping("/edit")
 	public ResponseEntity<ApiResponse<TimeLogDto>> edit(@Valid @RequestBody TimeLogDto timeLogDto){
 		ApiResponse<TimeLogDto> apiResponse = timeLogService.edit(timeLogDto);
 		if(!apiResponse.isSuccess()) {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiResponse);}
 		return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
 	}
-	
+	@PreAuthorize("#timeLogDto.employeeId==principal.userID")
 	@DeleteMapping("/delete/{logId}")
 	public ResponseEntity<ApiResponse<String>> delete(@PathVariable("logId") Long logId){
 		ApiResponse<String> delete = timeLogService.delete(logId);

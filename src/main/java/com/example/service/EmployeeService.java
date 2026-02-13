@@ -2,9 +2,16 @@ package com.example.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import com.example.repository.OrganizationRepository;
+import com.example.repository.RoleRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.dto.ApiResponse;
@@ -15,6 +22,7 @@ import com.example.entity.DepartmentEntity;
 import com.example.entity.EmployeeEntity;
 import com.example.entity.EmployeeStatus;
 import com.example.entity.OrganizationEntity;
+import com.example.entity.RoleEntity;
 import com.example.repository.DepartmentRepository;
 import com.example.repository.EmployeeRepository;
 
@@ -27,6 +35,10 @@ public class EmployeeService {
 	private DepartmentService departmentService;
 	private OrganizationRepository organizationRepository;
 	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
+	@Autowired
+	private RoleRepository roleRepository;
+	@Autowired
 	public EmployeeService(EmployeeRepository employeeRepository,ModelMapper modelMapper,DepartmentRepository departmentRepository,
 						   DepartmentService departmentService,OrganizationService organizationService, OrganizationRepository organizationRepository) {
 		this.employeeRepository=employeeRepository;
@@ -35,7 +47,7 @@ public class EmployeeService {
 		this.departmentService=departmentService;
 		this.organizationRepository=organizationRepository;
 	}
-	
+	@Transactional
 	public ApiResponse<EmployeeDto> save(EmployeeDto empDto,Long employeeId){
 		EmployeeEntity map = modelMapper.map(empDto,EmployeeEntity.class);
 		Optional<EmployeeEntity> empOpt =
@@ -53,13 +65,17 @@ public class EmployeeService {
 		    if(byIdAndStatus.isEmpty()) {return new ApiResponse(false,"Department not found or inactive",null);}
 		    Optional<OrganizationEntity> byIdAndStatus2 = organizationRepository.findByIdAndStatus(empDto.getOrganizationId(),"ACTIVE");
 		    if(byIdAndStatus2.isEmpty()) {return new ApiResponse(false,"Organization not found or inactive",null);}
-		    if(employee.getDesignation().equalsIgnoreCase("hr") || employee.getDesignation().equalsIgnoreCase("ceo")) 
+		    if(employee.getDesignation().equalsIgnoreCase("hr") || employee.getDesignation().equalsIgnoreCase("ceo") || employee.getDesignation().equalsIgnoreCase("owner")) 
 		    {
 		    	ApiResponse<DepartmentDto> byOrgAndDept = departmentService.getByOrgAndDept(empDto.getOrganizationId(),empDto.getDepartmentId());
 		    	if(!byOrgAndDept.isSuccess()) {return new ApiResponse(false,byOrgAndDept.getMessage(),null);}
 		    	map.setDeptId(byIdAndStatus.get());
 		    	map.setOrganizationId(byIdAndStatus2.get());
+		    	map.setPassword(passwordEncoder.encode(empDto.getPassword()));
+		    	
 		    	EmployeeEntity save = employeeRepository.save(map);
+		    	List<RoleEntity> list =  roleRepository.findAllById(empDto.getRoleId());
+		    	map.setRoles(list);
 		    	return new ApiResponse(true,"success",toDto(save));
 		    }
 		    else {
@@ -190,7 +206,9 @@ public class EmployeeService {
 	    dto.setJoiningDate(employee.getJoiningDate());
 	    dto.setStatus(employee.getStatus());
 	    dto.setNumber(employee.getNumber());
-
+	    dto.setPassword(employee.getPassword());
+	    List<Long> list = employee.getRoles().stream().map(roleentity->roleentity.getId()).toList();
+	    dto.setRoleId(list);
 	   
 	    if (employee.getDeptId() != null) {
 	        dto.setDepartmentId(employee.getDeptId().getId());

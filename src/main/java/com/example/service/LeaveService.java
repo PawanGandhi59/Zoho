@@ -61,9 +61,12 @@ public class LeaveService {
 		return new ApiResponse(true,"success",save.toDto());
 	}
 	
-	public ApiResponse<LeaveBalanceDto> addLeaveBalance(LeaveBalanceDto leaveBalanceDto){
+	public ApiResponse<LeaveBalanceDto> addLeaveBalance(LeaveBalanceDto leaveBalanceDto,Long adderId){
 		Optional<EmployeeEntity> employee = employeeRepository.findByIdAndStatus(leaveBalanceDto.getEmployeeId(),EmployeeStatus.ACTIVE);
 		if(employee.isEmpty()) {return new ApiResponse(false,"Employee not found or inactive",null);}
+		Optional<EmployeeEntity> adder = employeeRepository.findByIdAndStatus(adderId,EmployeeStatus.ACTIVE);
+		if(adder.isEmpty()) {return new ApiResponse(false,"Leave adder not found or inactive",null);}
+		if(!employee.get().getOrganizationId().getId().equals(adder.get().getOrganizationId().getId())) {return new ApiResponse(false,"Leave adder and employee does not belong to same organization",null);}
 		Optional<LeaveTypeEntity> leaveType = leaveTypeRepository.findById(leaveBalanceDto.getLeaveTypeId());
 		if(leaveType.isEmpty()) {return new ApiResponse(false,"No such  leave type found",null);}
 		boolean exists = leaveBalanceRepository.existsByEmployee_IdAndLeaveType_IdAndYear(leaveBalanceDto.getEmployeeId(), leaveBalanceDto.getLeaveTypeId(),leaveBalanceDto.getYear());

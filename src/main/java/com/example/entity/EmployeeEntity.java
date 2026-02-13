@@ -1,6 +1,9 @@
 package com.example.entity;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +14,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -41,6 +46,27 @@ public class EmployeeEntity {
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="organization_id")
 	private OrganizationEntity organizationId;
+	@Column(name="password")
+	private String password;
+	@ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "employee_roles",
+        joinColumns = @JoinColumn(name = "employee_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<RoleEntity> roles ;
+    public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public List<RoleEntity> getRoles() {
+		return roles;
+	}
+	public void setRoles(List<RoleEntity> roles) {
+		this.roles = roles;
+	}
 	public Long getId() {
 		return id;
 	}

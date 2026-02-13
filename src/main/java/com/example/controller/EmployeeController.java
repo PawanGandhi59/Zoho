@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,10 +22,15 @@ import com.example.entity.EmployeeStatus;
 import com.example.repository.EmployeeRepository;
 import com.example.service.EmployeeService;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/employees")
+@Tag(name = "Employee api's")
+//@Hidden
 public class EmployeeController {
 
     private final EmployeeRepository employeeRepository;
@@ -33,14 +40,14 @@ public class EmployeeController {
 		this.employeeService=employeeService;
 		this.employeeRepository = employeeRepository;
 	}
-	
+	@PreAuthorize("hasRole('SUPER_ADMIN','ADMIN','OWNER','HR','HOD','MANAGER','CEO') and #id==principal.userId and #empDto.organizationId==principal.userId")
 	@PostMapping("/create/{creatorId}")
 	public ResponseEntity<ApiResponse<EmployeeDto>> create(@PathVariable("creatorId") Long id, @Valid @RequestBody EmployeeDto empDto){
 		ApiResponse<EmployeeDto> save = employeeService.save(empDto, id);
 		if(!save.isSuccess()) {return ResponseEntity.badRequest().body(save);}
 		return ResponseEntity.status(HttpStatus.CREATED).body(save);
 	}
-	
+	@PreAuthorize("#id==principal.orgId")
 	@GetMapping("/getbyorg/{orgId}")
 	public ResponseEntity<ApiResponse<List<EmployeeDto>>> getAllByOrg(@PathVariable("orgId") Long id){
 		ApiResponse<List<EmployeeDto>> allByOrg = employeeService.getAllByOrg(id);
@@ -53,14 +60,14 @@ public class EmployeeController {
 	public ResponseEntity<List<EmployeeProjectionDto>> getAllByDept(@PathVariable("deptId") Long id){
 		return ResponseEntity.ok(employeeService.getByDept(id));
 	}
-	
+	@PostAuthorize("returnObject.body.data.organizationId==principal.orgId")
 	@GetMapping("/getbyid/{empId}")
 	public ResponseEntity<ApiResponse<EmployeeDto>> getByEmpId(@PathVariable("empId") Long id){
 		ApiResponse<EmployeeDto> byId = employeeService.getById(id);
 		if(!byId.isSuccess()) {return ResponseEntity.status(HttpStatus.NOT_FOUND).body(byId);}
 		return ResponseEntity.ok(byId);
 	}
-	
+	@PreAuthorize("hasRole('SUPER_ADMIN','ADMIN','OWNER','HR','HOD','MANAGER','CEO') and #changerId==principal.userId")
 	@PutMapping("/updatedesignation/{empId}/{changerId}/{newName}")
 	public ResponseEntity<ApiResponse<EmployeeDto>> updateDesignation(@PathVariable("empId") Long empId,
 			                                                          @PathVariable("changerId") Long changerId,
@@ -69,7 +76,7 @@ public class EmployeeController {
 		if(!updateDesignation.isSuccess()) {return ResponseEntity.badRequest().body(updateDesignation);}
 		return ResponseEntity.ok(updateDesignation);
 	}
-	
+	@PreAuthorize("hasRole('SUPER_ADMIN','ADMIN','OWNER','HR','HOD','MANAGER','CEO') and #changerId==principal.userId")
 	@PutMapping("/updatenumber/{empId}/{changerId}/{newName}")
 	public ResponseEntity<ApiResponse<EmployeeDto>> updateNumber(@PathVariable("empId") Long empId,
 			                                                          @PathVariable("changerId") Long changerId,
@@ -78,7 +85,7 @@ public class EmployeeController {
 		if(!updateNumber.isSuccess()) {return ResponseEntity.badRequest().body(updateNumber);}
 		return ResponseEntity.ok(updateNumber);
 	}
-	
+	@PreAuthorize("hasRole('SUPER_ADMIN','ADMIN','OWNER','HR','HOD','MANAGER','CEO') and #changerId==principal.userId")
 	@PutMapping("/deactivate/{empId}/{changerId}")
 	public ResponseEntity<ApiResponse<EmployeeDto>> deactivate(@PathVariable("empId") Long empId,@PathVariable("changerId") Long changerId){
 		ApiResponse<EmployeeDto> deactivate = employeeService.deactivate(empId, changerId,EmployeeStatus.RESIGNED);

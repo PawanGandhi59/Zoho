@@ -27,5 +27,5 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity,Long>{
 			AND e.deptId.id=:deptId
 			""")
 			List<EmployeeProjectionDto> findEmployeesByDepartmentAndStatus(EmployeeStatus status,Long deptId);
-
+			Optional<EmployeeEntity> findByEmailAndStatus(String email, EmployeeStatus status);
 }

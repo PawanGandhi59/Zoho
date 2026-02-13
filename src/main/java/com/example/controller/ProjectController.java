@@ -4,6 +4,7 @@ import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,14 +30,14 @@ public class ProjectController {
 		this.projectService=projectService;
 		this.projectRepository = projectRepository;
 	}
-	
+	@PreAuthorize("hasRole('SUPER_ADMIN','ADMIN','OWNER','HR','HOD','MANAGER','CEO') and #creatorId==principal.userId and #projectDto.organization==principal.orgId")
 	@PostMapping("/create/{creatorId}")
 	public ResponseEntity<ApiResponse<ProjectDto>> create(@PathVariable("creatorId")Long creatorId,@Valid @RequestBody ProjectDto projectDto){
 		ApiResponse<ProjectDto> apiResponse = projectService.create(projectDto, creatorId);
 		if(!apiResponse.isSuccess()) {return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);}
 		return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
 	}	
-	
+	@PreAuthorize("hasRole('SUPER_ADMIN','ADMIN','OWNER','HR','HOD','MANAGER','CEO') and #creatorId==principal.userId")
 	@PostMapping("/assign/{creatorId}")
 	public ResponseEntity<ApiResponse<ProjectAssignmentDto>> assign(@PathVariable("creatorId")Long creatorId,@Valid @RequestBody ProjectAssignmentDto projectAssignmentDto){
 		ApiResponse<ProjectAssignmentDto> assign = projectService.assign(projectAssignmentDto, creatorId);

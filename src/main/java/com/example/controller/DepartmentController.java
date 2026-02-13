@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.dto.ApiResponse;
@@ -27,7 +29,7 @@ public class DepartmentController {
     }
 
 
-
+    @PreAuthorize("hasAnyRole('OWNER','HR','MANAGER','ADMIN','SUPER_ADMIN') and #dto.organization==principal.orgId and #employeeId==principal.userId")
     @PostMapping("/create/{employeeId}")
     public ResponseEntity<ApiResponse<DepartmentDto>> create(
     		   @PathVariable Long employeeId,
@@ -39,19 +41,19 @@ public class DepartmentController {
     }
 
 
-
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<List<DepartmentDto>> getAll() {
         return ResponseEntity.ok(departmentService.getAll());
     }
-
+    @PostAuthorize("hasRole('SUPER_ADMIN') or returnObject.body.organization==principal.orgId")
     @GetMapping("/{id}")
     public ResponseEntity<DepartmentDto> getById(@PathVariable Long id) {
         Optional<DepartmentDto> dept = departmentService.get(id);
         if(dept.isEmpty()) {return ResponseEntity.notFound().build();}
         return ResponseEntity.ok(dept.get());
     }
-
+    @PreAuthorize("hasRole('SUPER_ADMIN') or #orgId==principal.orgId")
     @GetMapping("/organization/{orgId}")
     public ResponseEntity<ApiResponse<List<DepartmentDto>>> getByOrganization(
             @PathVariable Long orgId) {
@@ -60,7 +62,7 @@ public class DepartmentController {
         if(!byOrg.isSuccess()) {return ResponseEntity.status(HttpStatus.NOT_FOUND).body(byOrg);}
         return ResponseEntity.ok(byOrg);
     }
-
+    @PreAuthorize("hasRole('SUPER_ADMIN') or #orgId==principal.orgId")
     @GetMapping("/organization/{orgId}/{deptId}")
     public ResponseEntity<ApiResponse<DepartmentDto>> getByOrgAndDept(
             @PathVariable Long orgId,
@@ -72,7 +74,8 @@ public class DepartmentController {
     }
 
 
-
+    @PreAuthorize("hasAnyRole('OWNER','HR','MANAGER','ADMIN','SUPER_ADMIN') and #employeeId==principal.userId")
+    @PostAuthorize("returnObject.body.data.organization==principal.orgId")
     @PutMapping("/update/{deptId}/{employeeId}/{name}")
     public ResponseEntity<ApiResponse<DepartmentDto>> updateName(
             @PathVariable Long deptId,
@@ -85,7 +88,7 @@ public class DepartmentController {
     }
 
 
-
+    @PreAuthorize("hasRole('SUPER_ADMIN','OWNER','HR','ADMIN','MANAGER') and #employeeId==principal.userId")
     @PutMapping("/deactivate/{deptId}/{employeeId}")
     public ResponseEntity<ApiResponse<DepartmentDto>> deactivate(
             @PathVariable Long deptId,
@@ -97,7 +100,7 @@ public class DepartmentController {
     	return ResponseEntity.ok(deactivate);
     }
 
-
+    @PreAuthorize("hasRole('SUPER_ADMIN','OWNER','HR','ADMIN','MANAGER') and #assignerId==principal.userId")
     @PostMapping("/hod/{departmentId}/{employeeId}/{assignerId}")
     public ResponseEntity<ApiResponse<DepartmentHodDto>> assignHod(
             @PathVariable Long departmentId,
@@ -109,7 +112,7 @@ public class DepartmentController {
     	if(!assignHod.isSuccess()) {return ResponseEntity.status(HttpStatus.NOT_FOUND).body(assignHod);}
     	return ResponseEntity.ok(assignHod);
     }
-
+    @PostAuthorize("returnObject.body.data[0].organizationId==principal.orgId")
     @GetMapping("/hod/{departmentId}")
     public ResponseEntity<ApiResponse<List<EmployeeDto>>> getHods(
             @PathVariable Long departmentId) {
